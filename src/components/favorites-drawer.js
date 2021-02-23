@@ -15,6 +15,7 @@ export default function FavoritesDrawer ({ isOpen, onClose, title, children }) {
         isOpen={isOpen}
         placement="right"
         onClose={onClose}
+        size="md"
       >
         <DrawerOverlay>
           <DrawerContent>
@@ -22,7 +23,7 @@ export default function FavoritesDrawer ({ isOpen, onClose, title, children }) {
             <DrawerHeader borderBottomWidth="1px">
               Favorites
             </DrawerHeader>
-            <DrawerBody>
+            <DrawerBody style={{overflowY: "scroll"}}>
               <Stack spacing="24px">
                 <Box>
                     <Heading fontSize="xl">{title}</Heading>

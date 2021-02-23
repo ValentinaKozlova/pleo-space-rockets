@@ -10,7 +10,8 @@ import LoadMoreButton from "./load-more-button";
 import FavoritesDrawer from "./favorites-drawer";
 import {AddToFavoritesButton} from "./add-to-favorites";
 import { useDisclosure } from "@chakra-ui/react";
-import {getFavorites, updateFavorites} from "./updateFavorites"
+import {getFavorites, updateFavorites} from "./updateFavorites";
+import {FavoritesButton} from "./favorites-button";
 
 const PAGE_SIZE = 12;
 
@@ -25,23 +26,20 @@ export default function Launches() {
     }
   );
 
-  function renderFavoriteLaunches() {
-      const favoriteLaunches = JSON.parse(localStorage.getItem("launches"));
-      for (let item in favoriteLaunches) {
-          let launchId = favoriteLaunches[item]
-          let launch = data && data.flat()[launchId] && data.flat()[launchId]
-
-          if (launch) {
-              return <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} />
-          }
-      }
-  }
+  const favoriteLaunches = JSON.parse(localStorage.getItem("launches"));
+  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches.hasOwnProperty(`launches_${i}`));
 
   return (
     <div>
-      <Breadcrumbs
-        items={[{ label: "Home", to: "/" }, { label: "Launches" }]}
-      />
+      <Flex
+        align="center"
+        justify="space-between"
+      >
+        <Breadcrumbs
+          items={[{ label: "Home", to: "/" }, { label: "Launches" }]}
+        />
+        <FavoritesButton onOpen={onOpen} />
+      </Flex>
       <SimpleGrid m={[2, null, 6]} minChildWidth="350px" spacing="4">
         {error && <Error />}
         {data &&
@@ -63,7 +61,9 @@ export default function Launches() {
         onClose={onClose}
       >
           {
-              renderFavoriteLaunches()
+              launchesArr && launchesArr.map(launch => {
+                return <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} />
+              })
           }
       </FavoritesDrawer>
     </div>
@@ -111,7 +111,7 @@ export function LaunchItem({ launch, onOpen, dataIndex }) {
         objectPosition="bottom"
       />
 
-      <Box p="6" d="flex" alignItems="baseline" justify="space-between">
+      <Box p="6" position="relative">
           <Box>
             <Box d="flex" alignItems="baseline">
               {launch.launch_success ? (

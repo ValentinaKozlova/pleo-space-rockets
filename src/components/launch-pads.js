@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Box, SimpleGrid, Text } from "@chakra-ui/core";
+import { Badge, Box, SimpleGrid, Text, Flex } from "@chakra-ui/core";
 import { Link } from "react-router-dom";
 
 import Error from "./error";
@@ -10,6 +10,7 @@ import FavoritesDrawer from "./favorites-drawer";
 import {AddToFavoritesButton} from "./add-to-favorites";
 import { useDisclosure } from "@chakra-ui/react";
 import {getFavorites, updateFavorites} from "./updateFavorites";
+import {FavoritesButton} from "./favorites-button";
 
 const PAGE_SIZE = 12;
 
@@ -22,23 +23,20 @@ export default function LaunchPads() {
     }
   );
 
-    function renderFavoriteLaunches() {
-        const favoritePads = JSON.parse(localStorage.getItem("pads"));
-        for (let item in favoritePads) {
-            let padId = favoritePads[item]
-            let launchPad = data && data.flat()[padId] && data.flat()[padId]
-
-            if (launchPad) {
-                return <LaunchPadItem key={launchPad.site_id} launchPad={launchPad} />
-            }
-        }
-    }
+  const favoritePads = JSON.parse(localStorage.getItem("pads"));
+  const padsArr = data && data.flat().filter((pad, i) => favoritePads.hasOwnProperty(`pads_${i}`));
 
   return (
     <div>
-      <Breadcrumbs
-        items={[{ label: "Home", to: "/" }, { label: "Launch Pads" }]}
-      />
+      <Flex
+        align="center"
+        justify="space-between"
+      >
+        <Breadcrumbs
+          items={[{ label: "Home", to: "/" }, { label: "Launch Pads" }]}
+        />
+        <FavoritesButton onOpen={onOpen} />
+      </Flex>
       <SimpleGrid m={[2, null, 6]} minChildWidth="350px" spacing="4">
         {error && <Error />}
         {data &&
@@ -60,7 +58,9 @@ export default function LaunchPads() {
             onClose={onClose}
         >
             {
-                renderFavoriteLaunches()
+              padsArr && padsArr.map(launchPad => {
+                return <LaunchPadItem key={launchPad.site_id} launchPad={launchPad} />
+              })
             }
         </FavoritesDrawer>
     </div>
