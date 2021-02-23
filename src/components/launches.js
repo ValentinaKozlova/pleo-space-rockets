@@ -2,10 +2,10 @@ import React from "react";
 import { Badge, Box, Image, SimpleGrid, Text, Flex, Tooltip } from "@chakra-ui/core";
 import { format as timeAgo } from "timeago.js";
 import { Link } from "react-router-dom";
-import moment from "moment"
+import moment from "moment-timezone"
 
 import { useSpaceXPaginated } from "../utils/use-space-x";
-import { formatDate } from "../utils/format-date";
+import { formatDateTime } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import LoadMoreButton from "./load-more-button";
@@ -112,13 +112,14 @@ export function LaunchItem({ launch }) {
           {launch.mission_name}
         </Box>
         <Flex>
-            <Tooltip hasArrow label={formatDate(launch.launch_date_utc)} style={{background: "#1a202c", color: "#fff", padding: "20px"}}>
-                <Text fontSize="sm">{moment(launch.launch_date_local).format('dddd, MMMM Do YYYY, h:mm:ss a')} </Text>
+            <Tooltip hasArrow label={`Your timezone ${formatDateTime(launch.launch_date_utc)}`} style={{background: "#1a202c", color: "#fff", padding: "20px"}}>
+                <Text fontSize="sm">{moment(launch.launch_date_local).tz('America/Los_Angeles').format('dddd, MMMM Do YYYY, h:mm:ss a')} </Text>
             </Tooltip>
           <Text color="gray.500" ml="2" fontSize="sm">
             {timeAgo(launch.launch_date_utc)}
           </Text>
         </Flex>
+          <Text fontSize="sm">{launch.launch_date_local} </Text>
       </Box>
     </Box>
   );
