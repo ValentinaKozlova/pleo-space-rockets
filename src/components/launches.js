@@ -2,16 +2,20 @@ import React from "react";
 import { Badge, Box, Image, SimpleGrid, Text, Flex } from "@chakra-ui/core";
 import { format as timeAgo } from "timeago.js";
 import { Link } from "react-router-dom";
-
 import { useSpaceXPaginated } from "../utils/use-space-x";
 import { formatDate } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import LoadMoreButton from "./load-more-button";
+import FavoritesDrawer from "./favorites-drawer";
+import {AddToFavoritesButton} from "./add-to-favorites";
+import { useDisclosure } from "@chakra-ui/react";
+import {getFavorites, updateFavorites} from "./updateFavorites"
 
 const PAGE_SIZE = 12;
 
 export default function Launches() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data, error, isValidating, setSize, size } = useSpaceXPaginated(
     "/launches/past",
     {
@@ -20,7 +24,19 @@ export default function Launches() {
       sort: "launch_date_utc",
     }
   );
-  console.log(data, error);
+
+  function renderFavoriteLaunches() {
+      const favoriteLaunches = JSON.parse(localStorage.getItem("launches"));
+      for (let item in favoriteLaunches) {
+          let launchId = favoriteLaunches[item]
+          let launch = data && data.flat()[launchId] && data.flat()[launchId]
+
+          if (launch) {
+              return <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} />
+          }
+      }
+  }
+
   return (
     <div>
       <Breadcrumbs
@@ -31,8 +47,8 @@ export default function Launches() {
         {data &&
           data
             .flat()
-            .map((launch) => (
-              <LaunchItem launch={launch} key={launch.flight_number} />
+            .map((launch, i) => (
+              <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} dataIndex={i} />
             ))}
       </SimpleGrid>
       <LoadMoreButton
@@ -41,11 +57,28 @@ export default function Launches() {
         pageSize={PAGE_SIZE}
         isLoadingMore={isValidating}
       />
+      <FavoritesDrawer
+        title="Launches"
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+          {
+              renderFavoriteLaunches()
+          }
+      </FavoritesDrawer>
     </div>
   );
 }
 
-export function LaunchItem({ launch }) {
+export function LaunchItem({ launch, onOpen, dataIndex }) {
+    function onAddToFavoritesClick(dataIndex) {
+        updateFavorites(dataIndex, "launches")
+        onOpen();
+    }
+    const favoriteLaunches = getFavorites("launches");
+    const key = `launches_${dataIndex}`
+    const isActive = favoriteLaunches && favoriteLaunches.hasOwnProperty(key)
+
   return (
     <Box
       as={Link}
@@ -78,44 +111,46 @@ export function LaunchItem({ launch }) {
         objectPosition="bottom"
       />
 
-      <Box p="6">
-        <Box d="flex" alignItems="baseline">
-          {launch.launch_success ? (
-            <Badge px="2" variant="solid" variantColor="green">
-              Successful
-            </Badge>
-          ) : (
-            <Badge px="2" variant="solid" variantColor="red">
-              Failed
-            </Badge>
-          )}
-          <Box
-            color="gray.500"
-            fontWeight="semibold"
-            letterSpacing="wide"
-            fontSize="xs"
-            textTransform="uppercase"
-            ml="2"
-          >
-            {launch.rocket.rocket_name} &bull; {launch.launch_site.site_name}
+      <Box p="6" d="flex" alignItems="baseline" justify="space-between">
+          <Box>
+            <Box d="flex" alignItems="baseline">
+              {launch.launch_success ? (
+                <Badge px="2" variant="solid" variantColor="green">
+                  Successful
+                </Badge>
+              ) : (
+                <Badge px="2" variant="solid" variantColor="red">
+                  Failed
+                </Badge>
+              )}
+              <Box
+                color="gray.500"
+                fontWeight="semibold"
+                letterSpacing="wide"
+                fontSize="xs"
+                textTransform="uppercase"
+                ml="2"
+              >
+                {launch.rocket.rocket_name} &bull; {launch.launch_site.site_name}
+              </Box>
+            </Box>
+            <Box
+              mt="1"
+              fontWeight="semibold"
+              as="h4"
+              lineHeight="tight"
+              isTruncated
+            >
+              {launch.mission_name}
+            </Box>
+            <Flex>
+              <Text fontSize="sm">{formatDate(launch.launch_date_utc)}</Text>
+              <Text color="gray.500" ml="2" fontSize="sm">
+                {timeAgo(launch.launch_date_utc)}
+              </Text>
+            </Flex>
           </Box>
-        </Box>
-
-        <Box
-          mt="1"
-          fontWeight="semibold"
-          as="h4"
-          lineHeight="tight"
-          isTruncated
-        >
-          {launch.mission_name}
-        </Box>
-        <Flex>
-          <Text fontSize="sm">{formatDate(launch.launch_date_utc)} </Text>
-          <Text color="gray.500" ml="2" fontSize="sm">
-            {timeAgo(launch.launch_date_utc)}
-          </Text>
-        </Flex>
+          <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(dataIndex)} />
       </Box>
     </Box>
   );

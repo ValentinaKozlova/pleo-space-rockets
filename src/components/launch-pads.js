@@ -6,16 +6,33 @@ import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import LoadMoreButton from "./load-more-button";
 import { useSpaceXPaginated } from "../utils/use-space-x";
+import FavoritesDrawer from "./favorites-drawer";
+import {AddToFavoritesButton} from "./add-to-favorites";
+import { useDisclosure } from "@chakra-ui/react";
+import {getFavorites, updateFavorites} from "./updateFavorites";
 
 const PAGE_SIZE = 12;
 
 export default function LaunchPads() {
+    const { isOpen, onOpen, onClose } = useDisclosure();
   const { data, error, isValidating, size, setSize } = useSpaceXPaginated(
     "/launchpads",
     {
       limit: PAGE_SIZE,
     }
   );
+
+    function renderFavoriteLaunches() {
+        const favoritePads = JSON.parse(localStorage.getItem("pads"));
+        for (let item in favoritePads) {
+            let padId = favoritePads[item]
+            let launchPad = data && data.flat()[padId] && data.flat()[padId]
+
+            if (launchPad) {
+                return <LaunchPadItem key={launchPad.site_id} launchPad={launchPad} />
+            }
+        }
+    }
 
   return (
     <div>
@@ -27,8 +44,8 @@ export default function LaunchPads() {
         {data &&
           data
             .flat()
-            .map((launchPad) => (
-              <LaunchPadItem key={launchPad.site_id} launchPad={launchPad} />
+            .map((launchPad, i) => (
+              <LaunchPadItem onOpen={onOpen} key={launchPad.site_id} launchPad={launchPad} dataIndex={i} />
             ))}
       </SimpleGrid>
       <LoadMoreButton
@@ -37,11 +54,27 @@ export default function LaunchPads() {
         pageSize={PAGE_SIZE}
         isLoadingMore={isValidating}
       />
+        <FavoritesDrawer
+            title="Launch Pads"
+            isOpen={isOpen}
+            onClose={onClose}
+        >
+            {
+                renderFavoriteLaunches()
+            }
+        </FavoritesDrawer>
     </div>
   );
 }
 
-function LaunchPadItem({ launchPad }) {
+function LaunchPadItem({ launchPad, onOpen, dataIndex }) {
+    function onAddToFavoritesClick(dataIndex) {
+        updateFavorites(dataIndex, "pads")
+        onOpen();
+    }
+    const favoriteLaunches = getFavorites("pads");
+    const key = `pads_${dataIndex}`
+    const isActive = favoriteLaunches && favoriteLaunches.hasOwnProperty(key)
   return (
     <Box
       as={Link}
@@ -89,6 +122,7 @@ function LaunchPadItem({ launchPad }) {
           {launchPad.vehicles_launched.join(", ")}
         </Text>
       </Box>
+        <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(dataIndex)} />
     </Box>
   );
 }
