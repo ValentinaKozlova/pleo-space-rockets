@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Badge, Box, SimpleGrid, Text, Flex } from "@chakra-ui/core";
 import { Link } from "react-router-dom";
 
@@ -9,7 +9,7 @@ import { useSpaceXPaginated } from "../utils/use-space-x";
 import FavoritesDrawer from "./favorites-drawer";
 import {AddToFavoritesButton} from "./add-to-favorites";
 import { useDisclosure } from "@chakra-ui/react";
-import {getFavorites, updateFavorites} from "./updateFavorites";
+import {getFavorites, addToFavorites, removeFromFavorites} from "./updateFavorites";
 import {FavoritesButton} from "./favorites-button";
 
 const PAGE_SIZE = 12;
@@ -43,7 +43,7 @@ export default function LaunchPads() {
           data
             .flat()
             .map((launchPad, i) => (
-              <LaunchPadItem onOpen={onOpen} key={launchPad.site_id} launchPad={launchPad} dataIndex={i} />
+              <LaunchPadItem onOpen={onOpen} key={launchPad.site_id} siteId={launchPad.site_id} launchPad={launchPad} dataIndex={i} />
             ))}
       </SimpleGrid>
       <LoadMoreButton
@@ -67,13 +67,23 @@ export default function LaunchPads() {
   );
 }
 
-function LaunchPadItem({ launchPad, onOpen, dataIndex }) {
+function LaunchPadItem({ launchPad, onOpen, dataIndex, siteId }) {
+    const name = "pads"
+    const favoritePads = getFavorites(name);
+    const key = `pads_${dataIndex}`;
+    let isInFavorites = favoritePads && favoritePads.hasOwnProperty(key);
+
+    const [isActive, setIsActive] = useState(isInFavorites)
     function onAddToFavoritesClick(dataIndex) {
-        updateFavorites(dataIndex, "pads", onOpen)
+        if (!isInFavorites) {
+            addToFavorites(dataIndex, siteId, name, onOpen)
+            setIsActive(true)
+        } else {
+            removeFromFavorites(dataIndex, name)
+            setIsActive(false)
+        }
     }
-    const favoriteLaunches = getFavorites("pads");
-    const key = `pads_${dataIndex}`
-    const isActive = favoriteLaunches && favoriteLaunches.hasOwnProperty(key)
+
   return (
     <Box
       as={Link}

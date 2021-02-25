@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Badge, Box, Image, SimpleGrid, Text, Flex } from "@chakra-ui/core";
 import { format as timeAgo } from "timeago.js";
 import { Link } from "react-router-dom";
@@ -10,7 +10,7 @@ import LoadMoreButton from "./load-more-button";
 import FavoritesDrawer from "./favorites-drawer";
 import {AddToFavoritesButton} from "./add-to-favorites";
 import { useDisclosure } from "@chakra-ui/react";
-import {getFavorites, updateFavorites} from "./updateFavorites";
+import {getFavorites, addToFavorites, removeFromFavorites} from "./updateFavorites";
 import {FavoritesButton} from "./favorites-button";
 
 const PAGE_SIZE = 12;
@@ -46,7 +46,7 @@ export default function Launches() {
           data
             .flat()
             .map((launch, i) => (
-              <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} dataIndex={i} />
+              <LaunchItem key={i} launch={launch} flightNumber={launch.flight_number} onOpen={onOpen} dataIndex={i} />
             ))}
       </SimpleGrid>
       <LoadMoreButton
@@ -61,8 +61,8 @@ export default function Launches() {
         onClose={onClose}
       >
           {
-              launchesArr && launchesArr.map(launch => {
-                return <LaunchItem launch={launch} key={launch.flight_number} onOpen={onOpen} />
+              launchesArr && launchesArr.map((launch, i) => {
+                return <LaunchItem key={i} launch={launch} flightNumber={launch.flight_number} onOpen={onOpen} />
               })
           }
       </FavoritesDrawer>
@@ -70,17 +70,23 @@ export default function Launches() {
   );
 }
 
-export function LaunchItem({ launch, onOpen, dataIndex }) {
-    const favoriteLaunches = getFavorites("launches");
-    console.log(favoriteLaunches)
-    const key = `launches_${dataIndex}`
+export function LaunchItem({ launch, onOpen, dataIndex, flightNumber }) {
+    const name = "launches"
+    const favoriteLaunches = getFavorites(name);
+    const key = `${name}_${dataIndex}`
+    let isInFavorites = favoriteLaunches && favoriteLaunches.hasOwnProperty(key);
+    const [isActive, setIsActive] = useState(isInFavorites)
 
     function onAddToFavoritesClick(dataIndex) {
-        updateFavorites(dataIndex, "launches", onOpen)
-        console.log(getFavorites("launches"))
+        if (!isInFavorites) {
+            addToFavorites(dataIndex, flightNumber, name, onOpen)
+            setIsActive(true)
+        } else {
+            removeFromFavorites(dataIndex, name)
+            setIsActive(false)
+        }
     }
-    const isActive = favoriteLaunches && favoriteLaunches.hasOwnProperty(key)
-// TODO передать аргументом favoriteLaunches и isActive, dataIndex - remove from parameters
+
   return (
     <Box
       as={Link}

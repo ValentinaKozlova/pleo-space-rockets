@@ -10,16 +10,24 @@ function updateLocalStorage(name, favorites) {
         console.error("Your browser doesn't support localStorage"); // data could be added to cookies
     }
 }
-export function updateFavorites(dataIndex, name, onOpen) {
+
+export function addToFavorites(dataIndex, flight_number, name, onOpen) {
     const favorites = getFavorites(name) || {};
     const key = `${name}_${dataIndex}`
 
-    if (favorites && favorites.hasOwnProperty(key)) {
-        delete favorites[key];
-        updateLocalStorage(name, favorites)
-    } else {
-        favorites[key] = dataIndex
+    if (!favorites.hasOwnProperty(key)) {
+        favorites[key] = flight_number
         updateLocalStorage(name, favorites)
         onOpen && onOpen()
+    }
+}
+
+export function removeFromFavorites(dataIndex, name) {
+    const favorites = getFavorites(name) || {};
+    const key = `${name}_${dataIndex}`
+
+    if (favorites.hasOwnProperty(key)) {
+        delete favorites[key];
+        updateLocalStorage(name, favorites)
     }
 }

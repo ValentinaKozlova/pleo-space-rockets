@@ -21,17 +21,21 @@ import {
   StatGroup,
 } from "@chakra-ui/core";
 import {AddToFavoritesButton} from "./add-to-favorites";
+import styled from "@emotion/styled";
 
 import { useSpaceX } from "../utils/use-space-x";
 import { formatDateTime } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
-import {getFavorites} from "./updateFavorites";
+import {addToFavorites, getFavorites, removeFromFavorites} from "./updateFavorites";
+
+const FavoritesButton = styled(AddToFavoritesButton)`
+  position: relative;
+`;
 
 export default function Launch() {
   let { launchId } = useParams();
   const { data: launch, error } = useSpaceX(`/launches/${launchId}`);
-  const favoriteLaunches = getFavorites("launches");
 
   if (error) return <Error />;
   if (!launch) {
@@ -66,6 +70,20 @@ export default function Launch() {
 }
 
 function Header({ launch }) {
+  const name = "launches";
+  const favoriteLaunches = getFavorites(name);
+  const favoriteName = Object.keys(favoriteLaunches).find(key => favoriteLaunches[key] == launch.flight_number);
+  const [isActive, setIsActive] = React.useState(favoriteName? true : false);
+
+  function onAddToFavoritesClick(dataIndex) {
+    if (isActive) {
+      // removeFromFavorites(dataIndex, name)
+      setIsActive(true)
+    } else {
+      //   addToFavorites(dataIndex, flightNumber, name, onOpen)
+      setIsActive(false)
+    }
+  }
   return (
     <Flex
       bgImage={`url(${launch.links.flickr_images[0]})`}
@@ -99,6 +117,7 @@ function Header({ launch }) {
         {launch.mission_name}
       </Heading>
       <Stack isInline spacing="3">
+        <FavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(1)} />
         <Badge variantColor="purple" fontSize={["xs", "md"]}>
           #{launch.flight_number}
         </Badge>
