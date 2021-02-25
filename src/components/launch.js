@@ -33,8 +33,6 @@ export default function Launch() {
   const { data: launch, error } = useSpaceX(`/launches/${launchId}`);
   const favoriteLaunches = getFavorites("launches");
 
-  console.log(favoriteLaunches)
-
   if (error) return <Error />;
   if (!launch) {
     return (

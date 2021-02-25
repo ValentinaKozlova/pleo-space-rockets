@@ -26,7 +26,7 @@ export default function Launches() {
     }
   );
 
-  const favoriteLaunches = JSON.parse(localStorage.getItem("launches"));
+  const favoriteLaunches = getFavorites("launches");
   const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches.hasOwnProperty(`launches_${i}`));
 
   return (
@@ -71,13 +71,16 @@ export default function Launches() {
 }
 
 export function LaunchItem({ launch, onOpen, dataIndex }) {
+    const favoriteLaunches = getFavorites("launches");
+    console.log(favoriteLaunches)
+    const key = `launches_${dataIndex}`
+
     function onAddToFavoritesClick(dataIndex) {
         updateFavorites(dataIndex, "launches", onOpen)
+        console.log(getFavorites("launches"))
     }
-    const favoriteLaunches = getFavorites("launches");
-    const key = `launches_${dataIndex}`
     const isActive = favoriteLaunches && favoriteLaunches.hasOwnProperty(key)
-
+// TODO передать аргументом favoriteLaunches и isActive, dataIndex - remove from parameters
   return (
     <Box
       as={Link}
