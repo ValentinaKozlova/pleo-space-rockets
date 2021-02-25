@@ -1,8 +1,7 @@
 import React from "react";
-import { Badge, Box, Image, SimpleGrid, Text, Flex, Tooltip } from "@chakra-ui/core";
+import { Badge, Box, Image, SimpleGrid, Text, Tooltip } from "@chakra-ui/core";
 import { format as timeAgo } from "timeago.js";
 import { Link } from "react-router-dom";
-import moment from "moment-timezone"
 
 import { useSpaceXPaginated } from "../utils/use-space-x";
 import { formatDateTime, formatDateTimeMoment } from "../utils/format-date";
