@@ -20,15 +20,20 @@ import {
   AspectRatioBox,
   StatGroup,
 } from "@chakra-ui/core";
+import {AddToFavoritesButton} from "./add-to-favorites";
 
 import { useSpaceX } from "../utils/use-space-x";
 import { formatDateTime } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
+import {getFavorites} from "./updateFavorites";
 
 export default function Launch() {
   let { launchId } = useParams();
   const { data: launch, error } = useSpaceX(`/launches/${launchId}`);
+  const favoriteLaunches = getFavorites("launches");
+
+  console.log(favoriteLaunches)
 
   if (error) return <Error />;
   if (!launch) {

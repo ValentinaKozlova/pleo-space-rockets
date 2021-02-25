@@ -69,8 +69,7 @@ export default function LaunchPads() {
 
 function LaunchPadItem({ launchPad, onOpen, dataIndex }) {
     function onAddToFavoritesClick(dataIndex) {
-        updateFavorites(dataIndex, "pads")
-        onOpen();
+        updateFavorites(dataIndex, "pads", onOpen)
     }
     const favoriteLaunches = getFavorites("pads");
     const key = `pads_${dataIndex}`

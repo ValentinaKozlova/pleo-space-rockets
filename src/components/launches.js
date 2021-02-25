@@ -72,8 +72,7 @@ export default function Launches() {
 
 export function LaunchItem({ launch, onOpen, dataIndex }) {
     function onAddToFavoritesClick(dataIndex) {
-        updateFavorites(dataIndex, "launches")
-        onOpen();
+        updateFavorites(dataIndex, "launches", onOpen)
     }
     const favoriteLaunches = getFavorites("launches");
     const key = `launches_${dataIndex}`
