@@ -24,7 +24,7 @@ export default function LaunchPads() {
   );
 
   const favoritePads = JSON.parse(localStorage.getItem("pads"));
-  const padsArr = data && data.flat().filter((pad, i) => favoritePads.hasOwnProperty(`pads_${i}`));
+  const padsArr = data && data.flat().filter((pad, i) => favoritePads && favoritePads.hasOwnProperty(`pads_${i}`));
 
   return (
     <div>

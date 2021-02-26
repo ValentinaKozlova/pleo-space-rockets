@@ -46,7 +46,7 @@ export default function Launch() {
 
   const groupName = "launches"
   const favoriteLaunches = getFavorites(groupName);
-  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches.hasOwnProperty(`launches_${i}`));
+  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches && favoriteLaunches.hasOwnProperty(`launches_${i}`));
   const favoriteName = Object.keys(favoriteLaunches).find(key => favoriteLaunches[key] == launchId);
 
   if (error) return <Error />;

@@ -27,7 +27,7 @@ export default function Launches() {
   );
 
   const favoriteLaunches = getFavorites("launches");
-  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches.hasOwnProperty(`launches_${i}`));
+  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches && favoriteLaunches.hasOwnProperty(`launches_${i}`));
 
   return (
     <div>
