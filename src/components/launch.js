@@ -20,7 +20,8 @@ import {
   AspectRatioBox,
   StatGroup,
 } from "@chakra-ui/core";
-import {AddToFavoritesButton} from "./add-to-favorites";
+import { useDisclosure } from "@chakra-ui/react";
+import {AddToFavoritesButton} from "./add-to-favorites-button";
 import styled from "@emotion/styled";
 
 import { useSpaceX } from "../utils/use-space-x";
@@ -28,6 +29,7 @@ import { formatDateTime } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import {addToFavorites, getFavorites, removeFromFavorites} from "./updateFavorites";
+import FavoritesDrawer from "./favorites-drawer";
 
 const FavoritesButton = styled(AddToFavoritesButton)`
   position: relative;
@@ -70,17 +72,18 @@ export default function Launch() {
 }
 
 function Header({ launch }) {
-  const name = "launches";
-  const favoriteLaunches = getFavorites(name);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const groupName = "launches"
+  const favoriteLaunches = getFavorites(groupName);
   const favoriteName = Object.keys(favoriteLaunches).find(key => favoriteLaunches[key] == launch.flight_number);
   const [isActive, setIsActive] = React.useState(favoriteName? true : false);
 
-  function onAddToFavoritesClick(dataIndex) {
+  function onAddToFavoritesClick(flightNumber) {
     if (isActive) {
-      // removeFromFavorites(dataIndex, name)
+      removeFromFavorites(groupName, favoriteName)
       setIsActive(true)
     } else {
-      //   addToFavorites(dataIndex, flightNumber, name, onOpen)
+        addToFavorites(groupName, favoriteName, flightNumber, onOpen)
       setIsActive(false)
     }
   }
@@ -117,7 +120,7 @@ function Header({ launch }) {
         {launch.mission_name}
       </Heading>
       <Stack isInline spacing="3">
-        <FavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(1)} />
+        <FavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(launch.flight_number)} />
         <Badge variantColor="purple" fontSize={["xs", "md"]}>
           #{launch.flight_number}
         </Badge>

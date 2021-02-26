@@ -11,23 +11,21 @@ function updateLocalStorage(name, favorites) {
     }
 }
 
-export function addToFavorites(dataIndex, flight_number, name, onOpen) {
-    const favorites = getFavorites(name) || {};
-    const key = `${name}_${dataIndex}`
+export function addToFavorites(favoritesGroup, name, flight_number, onOpen) {
+    const favorites = getFavorites(favoritesGroup) || {};
 
-    if (!favorites.hasOwnProperty(key)) {
-        favorites[key] = flight_number
-        updateLocalStorage(name, favorites)
+    if (!favorites.hasOwnProperty(name)) {
+        favorites[name] = flight_number
+        updateLocalStorage(favoritesGroup, favorites)
         onOpen && onOpen()
     }
 }
 
-export function removeFromFavorites(dataIndex, name) {
-    const favorites = getFavorites(name) || {};
-    const key = `${name}_${dataIndex}`
+export function removeFromFavorites(favoritesGroup, name) {
+    const favorites = getFavorites(favoritesGroup) || {};
 
-    if (favorites.hasOwnProperty(key)) {
-        delete favorites[key];
-        updateLocalStorage(name, favorites)
+    if (favorites.hasOwnProperty(name)) {
+        delete favorites[name];
+        updateLocalStorage(favoritesGroup, favorites)
     }
 }

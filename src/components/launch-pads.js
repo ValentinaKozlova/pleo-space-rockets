@@ -7,7 +7,7 @@ import Breadcrumbs from "./breadcrumbs";
 import LoadMoreButton from "./load-more-button";
 import { useSpaceXPaginated } from "../utils/use-space-x";
 import FavoritesDrawer from "./favorites-drawer";
-import {AddToFavoritesButton} from "./add-to-favorites";
+import {AddToFavoritesButton} from "./add-to-favorites-button";
 import { useDisclosure } from "@chakra-ui/react";
 import {getFavorites, addToFavorites, removeFromFavorites} from "./updateFavorites";
 import {FavoritesButton} from "./favorites-button";
@@ -68,18 +68,18 @@ export default function LaunchPads() {
 }
 
 function LaunchPadItem({ launchPad, onOpen, dataIndex, siteId }) {
-    const name = "pads"
-    const favoritePads = getFavorites(name);
-    const key = `pads_${dataIndex}`;
-    let isInFavorites = favoritePads && favoritePads.hasOwnProperty(key);
+    const groupName = "pads"
+    const favoritePads = getFavorites(groupName);
+    const name = `${groupName}_${dataIndex}`;
+    let isInFavorites = favoritePads && favoritePads.hasOwnProperty(name);
 
     const [isActive, setIsActive] = useState(isInFavorites)
-    function onAddToFavoritesClick(dataIndex) {
+    function onAddToFavoritesClick(siteId) {
         if (!isInFavorites) {
-            addToFavorites(dataIndex, siteId, name, onOpen)
+            addToFavorites(groupName, name, siteId, onOpen)
             setIsActive(true)
         } else {
-            removeFromFavorites(dataIndex, name)
+            removeFromFavorites(groupName, name)
             setIsActive(false)
         }
     }
@@ -131,7 +131,7 @@ function LaunchPadItem({ launchPad, onOpen, dataIndex, siteId }) {
           {launchPad.vehicles_launched.join(", ")}
         </Text>
       </Box>
-        <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(dataIndex)} />
+        <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(siteId)} />
     </Box>
   );
 }

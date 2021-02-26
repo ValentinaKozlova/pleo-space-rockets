@@ -8,7 +8,7 @@ import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import LoadMoreButton from "./load-more-button";
 import FavoritesDrawer from "./favorites-drawer";
-import {AddToFavoritesButton} from "./add-to-favorites";
+import {AddToFavoritesButton} from "./add-to-favorites-button";
 import { useDisclosure } from "@chakra-ui/react";
 import {getFavorites, addToFavorites, removeFromFavorites} from "./updateFavorites";
 import {FavoritesButton} from "./favorites-button";
@@ -71,18 +71,18 @@ export default function Launches() {
 }
 
 export function LaunchItem({ launch, onOpen, dataIndex, flightNumber }) {
-    const name = "launches"
-    const favoriteLaunches = getFavorites(name);
-    const key = `${name}_${dataIndex}`
-    let isInFavorites = favoriteLaunches && favoriteLaunches.hasOwnProperty(key);
+    const groupName = "launches"
+    const favoriteLaunches = getFavorites(groupName);
+    const name = `${groupName}_${dataIndex}`
+    let isInFavorites = favoriteLaunches && favoriteLaunches.hasOwnProperty(name);
     const [isActive, setIsActive] = useState(isInFavorites)
 
-    function onAddToFavoritesClick(dataIndex) {
+    function onAddToFavoritesClick() {
         if (!isInFavorites) {
-            addToFavorites(dataIndex, flightNumber, name, onOpen)
+            addToFavorites(groupName, name, flightNumber, onOpen)
             setIsActive(true)
         } else {
-            removeFromFavorites(dataIndex, name)
+            removeFromFavorites(groupName, name)
             setIsActive(false)
         }
     }
@@ -158,7 +158,7 @@ export function LaunchItem({ launch, onOpen, dataIndex, flightNumber }) {
               </Text>
             </Flex>
           </Box>
-          <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(dataIndex)} />
+          <AddToFavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(flightNumber)} />
       </Box>
     </Box>
   );
