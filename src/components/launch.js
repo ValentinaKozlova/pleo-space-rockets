@@ -22,19 +22,32 @@ import {
 } from "@chakra-ui/core";
 import { useDisclosure } from "@chakra-ui/react";
 import {AddToFavoritesButton} from "./add-to-favorites-button";
-import styled from "@emotion/styled";
 
-import { useSpaceX } from "../utils/use-space-x";
+import { useSpaceX, useSpaceXPaginated } from "../utils/use-space-x";
 import { formatDateTime } from "../utils/format-date";
 import Error from "./error";
 import Breadcrumbs from "./breadcrumbs";
 import {addToFavorites, getFavorites, removeFromFavorites} from "./updateFavorites";
 import FavoritesDrawer from "./favorites-drawer";
-
+import {LaunchItem} from "./launches";
 
 export default function Launch() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   let { launchId } = useParams();
   const { data: launch, error } = useSpaceX(`/launches/${launchId}`);
+  const { data } = useSpaceXPaginated(
+    "/launches/past",
+    {
+      limit: 12,
+      order: "desc",
+      sort: "launch_date_utc",
+    }
+  );
+
+  const groupName = "launches"
+  const favoriteLaunches = getFavorites(groupName);
+  const launchesArr = data && data.flat().filter((launch, i) => favoriteLaunches.hasOwnProperty(`launches_${i}`));
+  const favoriteName = Object.keys(favoriteLaunches).find(key => favoriteLaunches[key] == launchId);
 
   if (error) return <Error />;
   if (!launch) {
@@ -46,7 +59,7 @@ export default function Launch() {
   }
 
   return (
-    <div>
+    <>
       <Breadcrumbs
         items={[
           { label: "Home", to: "/" },
@@ -54,7 +67,7 @@ export default function Launch() {
           { label: `#${launch.flight_number}` },
         ]}
       />
-      <Header launch={launch} />
+      <Header launch={launch} onOpen={onOpen} favoriteName={favoriteName} groupName={groupName} />
       <Box m={[3, 6]}>
         <TimeAndLocation launch={launch} />
         <RocketInfo launch={launch} />
@@ -64,24 +77,31 @@ export default function Launch() {
         <Video launch={launch} />
         <Gallery images={launch.links.flickr_images} />
       </Box>
-    </div>
+      <FavoritesDrawer
+        title="Launches"
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+          {
+              launchesArr && launchesArr.map((launch, i) => {
+                return <LaunchItem key={i} launch={launch} flightNumber={launchId} onOpen={onOpen} />
+              })
+          }
+      </FavoritesDrawer>
+    </>
   );
 }
 
-function Header({ launch }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const groupName = "launches"
-  const favoriteLaunches = getFavorites(groupName);
-  const favoriteName = Object.keys(favoriteLaunches).find(key => favoriteLaunches[key] == launch.flight_number);
+function Header({ launch, onOpen, favoriteName, groupName }) {
   const [isActive, setIsActive] = React.useState(favoriteName? true : false);
 
   function onAddToFavoritesClick(flightNumber) {
-    if (isActive) {
-      removeFromFavorites(groupName, favoriteName)
+    if (!isActive) {
+      addToFavorites(groupName, favoriteName, flightNumber, onOpen)
       setIsActive(true)
     } else {
-        addToFavorites(groupName, favoriteName, flightNumber, onOpen)
-      setIsActive(false)
+        removeFromFavorites(groupName, favoriteName)
+        setIsActive(false)
     }
   }
   return (
