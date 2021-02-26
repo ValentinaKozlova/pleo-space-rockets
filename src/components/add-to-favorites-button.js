@@ -5,27 +5,30 @@ import styled from "@emotion/styled";
 
 const Button = styled.button`
   outline: none;
-  position: absolute;
-  top: 18px;
-  right: 18px
+  position: ${props =>
+    props.size==="l" ? 'relative' : 'absolute'};
+  top: ${props =>
+    props.size==="l" ? '0' : '18px'};
+  right: 18px;
 `
 
 const StarButton = styled(StarIcon)`
-    font-size: 24px
+    font-size: ${props =>
+        props.size==="l" ? '48px' : '24px'};
 `
 
-export function AddToFavoritesButton({onAddToFavoritesClick, id, isActive}) {
+export function AddToFavoritesButton({onAddToFavoritesClick, isActive, size}) {
     const label = `${isActive? "Remove from" : "Add to"} favorites`;
     function onButtonClick(e) {
         e.preventDefault()
         if (onAddToFavoritesClick) {
-            onAddToFavoritesClick(id)
+            onAddToFavoritesClick()
         }
     }
     return (
         <Tooltip hasArrow label={label} bg="#1A202C">
-            <Button onClick={e => onButtonClick(e)} >
-                <StarButton color={`${isActive? "#ff9800" : "#9e9e9e"}`} _hover={{ color: "#ffc107" }} />
+            <Button size={size} onClick={e => onButtonClick(e)} >
+                <StarButton size={size} color={`${isActive? "#ff9800" : "#9e9e9e"}`} _hover={{ color: "#ffc107" }} />
             </Button>
         </Tooltip>
     )

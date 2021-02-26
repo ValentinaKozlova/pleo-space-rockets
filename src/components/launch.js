@@ -120,7 +120,11 @@ function Header({ launch }) {
         {launch.mission_name}
       </Heading>
       <Stack isInline spacing="3">
-        <FavoritesButton isActive={isActive} onAddToFavoritesClick={() => onAddToFavoritesClick(launch.flight_number)} />
+        <AddToFavoritesButton
+          isActive={isActive}
+          size="l"
+          onAddToFavoritesClick={() => onAddToFavoritesClick(launch.flight_number)}
+        />
         <Badge variantColor="purple" fontSize={["xs", "md"]}>
           #{launch.flight_number}
         </Badge>
