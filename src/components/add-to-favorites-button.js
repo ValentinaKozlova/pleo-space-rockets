@@ -17,8 +17,10 @@ const StarButton = styled(StarIcon)`
         props.size==="l" ? '48px' : '24px'};
 `
 
-export function AddToFavoritesButton({onAddToFavoritesClick, isActive, size}) {
+export function AddToFavoritesButton({onAddToFavoritesClick, isActive, size, color}) {
     const label = `${isActive? "Remove from" : "Add to"} favorites`;
+    const starColor = color || "#9e9e9e";
+
     function onButtonClick(e) {
         e.preventDefault()
         if (onAddToFavoritesClick) {
@@ -28,7 +30,7 @@ export function AddToFavoritesButton({onAddToFavoritesClick, isActive, size}) {
     return (
         <Tooltip hasArrow label={label} bg="#1A202C">
             <Button size={size} onClick={e => onButtonClick(e)} >
-                <StarButton size={size} color={`${isActive? "#ff9800" : "#9e9e9e"}`} _hover={{ color: "#ffc107" }} />
+                <StarButton size={size} color={`${isActive? "#ff9800" : starColor}`} _hover={{ color: "#ffc107" }} />
             </Button>
         </Tooltip>
     )

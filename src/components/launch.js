@@ -31,9 +31,6 @@ import Breadcrumbs from "./breadcrumbs";
 import {addToFavorites, getFavorites, removeFromFavorites} from "./updateFavorites";
 import FavoritesDrawer from "./favorites-drawer";
 
-const FavoritesButton = styled(AddToFavoritesButton)`
-  position: relative;
-`;
 
 export default function Launch() {
   let { launchId } = useParams();
@@ -119,10 +116,11 @@ function Header({ launch }) {
       >
         {launch.mission_name}
       </Heading>
-      <Stack isInline spacing="3">
+      <Stack isInline spacing="3" style={{padding: "12px", borderRadius: "8px", paddingLeft: "28px", backgroundColor:"#718096b8"}}>
         <AddToFavoritesButton
           isActive={isActive}
           size="l"
+          color="#fff"
           onAddToFavoritesClick={() => onAddToFavoritesClick(launch.flight_number)}
         />
         <Badge variantColor="purple" fontSize={["xs", "md"]}>
